@@ -44,6 +44,7 @@ This schema represents the steps to set soft and hard limits on a resource group
     - Create two **Alert conditions** :
       1. Type _Actual_ à 80% du budget
       2. Type _Actual_ à 100% du budget
+      3. Type _Forecast_ à 110% du budget (reminder : the actual cost is not the real-time one)
     - Add your email address as **Alert recipients**
     - Click **Create**.
 
@@ -148,3 +149,39 @@ This schema represents the steps to set soft and hard limits on a resource group
     - Click **Review + Create**.
 
 6. Allow the app the list/delete resources in our resource group
+
+    Click on the browsing bar and search for the **Resource groups** page.
+
+    Select the resource group _MyServices_.
+
+    On the left pane, click **Access control (IAM)**
+
+    At top of the page, click the **Add** > **Add role assignment** button.
+
+    Configure the role assignment :
+
+    - In the **Role** tab, click the **Privileged administrator roles** sub-tab.
+    - Select (click) **Contributor**.
+    - Select **Assign access to** _User, group or service principal_.
+        - In the drawer that opened, type _DeleteResources_ in the **Select** textbox.
+        - Click on _DeleteResources_.
+        - Click **Select**.
+    - Click **Review + assign**.
+
+    :information_source: The **Contributor** role is broad. You might want to [create a custom role](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles) to attribute specific permissions (list/delete) to specific services (i.e: Cognitive Services, Search, VMs).
+
+7. Assign the action group to a budget threshold
+
+    Go to the **Subscription** page of the Azure portal and select **Budgets** on the left pane.
+
+    Select your _MyBudget_ budget.
+
+    At top of the page, click the **Edit budget** button.
+
+    Select the **Set alerts** tab.
+
+    In our previously-created **Alert conditions** of type _Actual_ and threshold _100%_, set **Action group** _DeleteServices_.
+
+    Click **Save**.
+
+You are now safe!
