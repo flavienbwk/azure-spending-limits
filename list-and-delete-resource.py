@@ -1,8 +1,8 @@
-# List and delete resources from a resource group using the Azure API (can be used in runbooks then triggered by Monitor > Alerts > Create action groups when budget is exceeded).
-# It requires an "Application Insights" resource.
+#!/usr/bin/env python3
+
+# Original repo : https://github.com/flavienbwk/azure-spending-limits
+# List and delete resources from a resource group using the Azure API.
 # Configure the CLIENT_ID (Azure App Registration) to be able to read/delete RESOURCE_GROUP's resources in the IAM of the RESOURCE_GROUP.
-#
-# Useful link : https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/cost-management-budget-scenario#create-webhooks-for-the-runbook
 
 import requests
 
