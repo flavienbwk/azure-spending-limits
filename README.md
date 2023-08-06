@@ -42,9 +42,9 @@ This schema represents the steps to set soft and hard limits on a resource group
     - **Name** it _MyBudget_ with a _monthly_ **reset period** and set the **Amount** to the hard limit you're willing to spend.
     - Click **Next**.
     - Create two **Alert conditions** :
-      1. Type _Actual_ à 80% du budget
-      2. Type _Actual_ à 100% du budget
-      3. Type _Forecast_ à 110% du budget (reminder : the actual cost is not the real-time one)
+      1. Type _Actual_ to 80% of budget
+      2. Type _Actual_ to 100% of budget
+      3. Type _Forecast_ to 110% of budget (reminder : the actual cost is not the real-time one)
     - Add your email address as **Alert recipients**
     - Click **Create**.
 
