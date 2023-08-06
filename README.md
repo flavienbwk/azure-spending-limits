@@ -108,4 +108,43 @@ This schema represents the steps to set soft and hard limits on a resource group
 
     Click **Save**, then **Publish**.
 
-5. 
+5. Create an action group that can then be triggered when a spending threshold is reached.
+
+    Click on the browsing bar and search for the **Monitor** page.
+
+    In the left pane, click **Applications**.
+
+    At top of the page, click the **Create** button.
+
+    Configure the "application insights" :
+
+    - Attribute our previously-created **Resource group** _MyServices_.
+    - **Name** it _MyAppInsight_.
+    - Set **Resource Mode** _Classic_.
+    - Click **Review + Create**.
+
+    Go back to the **Monitor** page.
+
+    On the left pane, click **Alerts**.
+
+    At top of the page, click the **Create** > **Action group** button.
+
+    Configure the "application insights" :
+
+    - Attribute our previously-created **Resource group** _MyServices_.
+    - Set **Action group name** to _DeleteResources_.
+    - Set **Display name** to _DeleteResources_ and click **Next**.
+    - In the **Notifications** tab, select **Notification type** _Email/SMS message/Push/Voice_.
+        - In the drawer that opened, select _Email_ and enter your email adress.
+        - Click **OK**.
+    - Click **Next**.
+    - In the **Actions** tab, select **Automation Runbook**.
+        - In the drawer that opened, set **Run runbook** to _Enabled_.
+        - Set **Runbook source** to _User_.
+        - Select your subscription.
+        - Select **Automation account** _MyAutomation_.
+        - Select **Runbook** _DeleteResources_.
+        - Click **OK**.
+    - Click **Review + Create**.
+
+6. Allow the app the list/delete resources in our resource group
