@@ -4,8 +4,8 @@ Minimal configuration to set soft **and hard** limits on Microsoft Azure to avoi
 
 Some examples of why it's useful :
 
-- Avoid unexpected API consumption spending (such as infinite loops)
-- Avoid cost for forgotten VMs or resources
+- Avoid unexpected API consumption spending (such as infinite loops) ;
+- Avoid cost for forgotten VMs or resources.
 
 The provided script will delete the services in a resource group with an action group. It won't delete the resource group, which is convenient. Also, this is a last resort solution as it will require you to reconfigure your services after removal.
 
