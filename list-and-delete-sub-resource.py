@@ -19,8 +19,6 @@ RESOURCE = 'https://management.azure.com/'
 
 # Azure resource details to be deleted
 SUBSCRIPTION_ID = 'xxxxxxxxxxx'
-RESOURCE_GROUP = 'xxxxxxxxxxx'
-RESOURCE_TYPE = 'accounts'
 
 # Endpoint for acquiring token
 TOKEN_ENDPOINT = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/token"
