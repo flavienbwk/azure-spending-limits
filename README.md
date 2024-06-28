@@ -1,5 +1,15 @@
 # Azure Spending Limits
 
+Learn how to set whether soft or hard limits or periodic removal on Microsoft Azure to prevent unexpected costs.
+
+- [Azure Spending Limits](#azure-spending-limits)
+  - [Soft and hard limits](#soft-and-hard-limits)
+    - [Howto: Setting soft and hard limits](#howto-setting-soft-and-hard-limits)
+  - [Periodic removal](#periodic-removal)
+    - [Howto: Periodic conditional removal](#howto-periodic-conditional-removal)
+
+## Soft and hard limits
+
 Minimal configuration to set soft **and hard** limits on Microsoft Azure to avoid overspending with a "Pay-as-you-go" account.
 
 Some examples of why it's useful :
@@ -7,11 +17,14 @@ Some examples of why it's useful :
 - Avoid unexpected API consumption spending (such as infinite loops) ;
 - Avoid cost for forgotten VMs or resources.
 
+<details>
+<summary>👉 Instructions to set soft and hard limits...</summary>
+
 The provided script will delete the services in a resource group with an action group. It won't delete the resource group, which is convenient. Also, this is a last resort solution as it will require you to reconfigure your services after removal.
 
 _This method is probably not the best but is "quick" to setup and just works. You might prefer [rate-limiting](https://techcommunity.microsoft.com/t5/azure-paas-blog/configure-rate-limits-for-different-api-operations-in-azure-api/ba-p/3789108) API calls, or trigger an action group on a [carefully analyzed spending](https://learn.microsoft.com/en-us/answers/questions/931661/how-can-i-find-how-much-per-hour-i-am-being-billed) (spoiler: this is hard)._
 
-## How to set soft and hard limits
+### Howto: Setting soft and hard limits
 
 Remember that accumulated cost showing in your "Cost Management" console is an estimate only. Real cost may [take time to update](https://learn.microsoft.com/en-us/azure/azure-monitor/usage-estimated-costs) and is generally stabilized one day after a resource is consumed. However, it is possible to set hard limits based on [forecasted cost](https://learn.microsoft.com/en-us/azure/cost-management-billing/finops/capabilities-forecasting).
 
@@ -50,9 +63,9 @@ This schema represents the steps to set soft and hard limits on a resource group
 
     You now have set your soft limit. It will e-mail you when reaching these thresholds.
 
-3. Configure an "App" in Active Directory to retrieve credentials to be used in our runbook.
+3. Configure an "App" in Entra ID to retrieve credentials to be used in our runbook.
 
-    Click on the browsing bar and search for the **Azure Active Directory** page.
+    Click on the browsing bar and search for the **Azure Entra ID** page.
 
     On the left pane, click **App registrations**.
 
@@ -64,7 +77,7 @@ This schema represents the steps to set soft and hard limits on a resource group
     - In the **Supported account types** menu, select _Accounts in this organizational directory only (Répertoire par défaut only - Single tenant)_.
     - Click **Register**.
 
-    Let's now generate an app secret and retrieve TENANT_ID, CLIENT_ID and CLIENT_SECRET values for the [`list-and-delete-resource.py`](./list-and-delete-resource.py) script.
+    Let's now generate an app secret and retrieve TENANT_ID, CLIENT_ID and CLIENT_SECRET values for the [`list-and-delete-rg-resource.py`](./list-and-delete-rg-resource.py) script.
 
     Enter your _DeleteResources_ app configuration from the **App registrations** page.
 
@@ -103,8 +116,8 @@ This schema represents the steps to set soft and hard limits on a resource group
     - Select **Runtime version** _3.8_.
     - Click **Create**.
 
-    Copy/paste the content of the [`list-and-delete-resource.py`](./list-and-delete-resource.py) file. 
-    
+    Copy/paste the content of the [`list-and-delete-rg-resource.py`](./list-and-delete-rg-resource.py) file.
+
     Replace the content of the TENANT_ID, CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION_ID and RESOURCE_GROUP variables.
 
     Click **Save**, then **Publish**.
@@ -185,3 +198,121 @@ This schema represents the steps to set soft and hard limits on a resource group
     Click **Save**.
 
 You are now safe!
+
+</details>
+
+## Periodic removal
+
+Minimal configuration to set periodic removal of resource groups under a specified **subscription**. You will be able to avoid cost caused by forgotten VMs or resources from your dev team.
+
+Every night at 02:00, resource will be removed. We will however add an exception for any resource group including `prod` or `permanent` in their name.
+
+<details>
+<summary>👉 Instructions to set periodic resource groups removal...</summary>
+
+We are going to create a perodically called runbook from an Azure Automation account.
+
+- It will run every night at 2 a.m. ;
+- It will remove resource groups under the specified subscription but those including "prod" or "permanent" in their name ;
+
+### Howto: Periodic conditional removal
+
+1. Retrieve your subscription ID and create automation's resource group
+
+    Click on the browsing bar and search for the **Subscriptions** page.
+
+    Click on your subscription.
+
+    Note down the **Subscription ID** as SUBSCRIPTION_ID.
+
+    Create a resource group named _MyPeriodicServices-permanent_ inside this subscription.
+
+2. Configure an "App" in Entra ID to retrieve credentials to be used in our runbook.
+
+    Click on the browsing bar and search for the **Azure Entra ID** page.
+
+    On the left pane, click **App registrations**.
+
+    At top of the page, click the **New registration** button.
+
+    Configure the app registration :
+
+    - **Name** it _PeriodicallyDeleteResources_.
+    - In the **Supported account types** menu, select _Accounts in this organizational directory only (Répertoire par défaut only - Single tenant)_.
+    - Click **Register**.
+
+    Let's now generate an app secret and retrieve TENANT_ID, CLIENT_ID and CLIENT_SECRET values for the [`list-and-delete-sub-resource.py`](./list-and-delete-sub-resource.py) script.
+
+    Enter your _DeletePeriodicResources_ app configuration from the **App registrations** page.
+
+    On the left pane, click **Certificates & secrets**.
+
+    Click **New client secret** and create one with the default expiration date (recommended). You need to make sure this secret is up-to-date in the later-to-be-created runbook.
+
+    Note down the CLIENT_SECRET value.
+
+    On the left pane, click **Overview**.
+
+    Note down the **Object ID** as CLIENT_ID, and **Directory (tenant) ID** as TENANT_ID.
+
+3. Create the runbook that will delete resources every night
+
+    Click on the browsing bar and search for the **Automation Accounts** page.
+
+    At top of the page, click the **Create** button.
+
+    Configure the automation account :
+
+    - Attribute our previously-created **Resource group** _MyPeriodicServices-permanent_.
+    - **Name** it _MyPeriodicAutomation_ and click **Next**.
+    - In the **Advanced** tab, select _System assigned_.
+    - In the **Networking** tab, select _Public access_.
+    - Click the **Review + Create** button
+
+    In your _MyAutomation_ **Automation Accounts**, click **Runbooks** in the left pane.
+
+    At top of the page, click the **Create a runbook** button.
+
+    Configure the runbook :
+
+    - **Name** it _DeletePeriodicResources_.
+    - Select **Runbook type** _Python_.
+    - Select **Runtime version** _3.8_.
+    - Click **Create**.
+
+    Copy/paste the content of the [`list-and-delete-sub-resource.py`](./list-and-delete-sub-resource.py) file.
+
+    Replace the content of the TENANT_ID, CLIENT_ID, CLIENT_SECRET and SUBSCRIPTION_ID variables.
+
+    Click **Save**, then **Publish**.
+
+4. Allow the app the list/delete resources in our subscription
+
+    Click on the browsing bar and go to your **Subscription** page.
+
+    On the left pane, click **Access control (IAM)**
+
+    At top of the page, click the **Add** > **Add role assignment** button.
+
+    Configure the role assignment :
+
+    - In the **Role** tab, click the **Privileged administrator roles** sub-tab.
+    - Select (click) **Contributor**.
+    - Select **Assign access to** _User, group or service principal_.
+        - In the drawer that opened, type _DeleteResources_ in the **Select** textbox.
+        - Click on _DeleteResources_.
+        - Click **Select**.
+    - Click **Review + assign**.
+
+    :information_source: The **Contributor** role is broad. You might want to [create a custom role](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles) to attribute specific permissions (list/delete) to specific services (i.e: Cognitive Services, Search, VMs).
+
+5. Create a schedule
+
+    - In the sidebar of your Automation account, click on the _Schedules_ tab ;
+    - Click "Add a schedule" ;
+    - Give it a name like "Daily at 2am" ;
+    - Set the start time to 2 a.m. (02:00) ;
+    - Set recurrence to "Daily" ;
+    - Set the time zone as needed.
+
+</details>
